@@ -3,30 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Welcome to CondoUnderground, a vibrant real-time chat platform for dynamic communication.">
-  <meta name="keywords" content="CondoUnderground, chat, messaging, community, real-time">
+  <meta name="description" content="Welcome to CondoUnderground, a vibrant real-time chat platform and condo data explorer.">
+  <meta name="keywords" content="CondoUnderground, chat, messaging, community, real-time, condo data, scraper">
   <meta name="author" content="CondoUnderground Team">
   <title>CondoUnderground - Home</title>
   <link rel="icon" type="image/png" href="/favicon.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2. MSU/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Additional vibrant styles */
+    .bg-gradient-animated {
+      background: linear-gradient(45deg, #60a5fa, #34d399, #f472b6, #a78bfa);
+      background-size: 400%;
+      animation: gradientShift 15s ease infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .hover-glow {
+      transition: all 0.3s ease;
+    }
+    .hover-glow:hover {
+      box-shadow: 0 0 15px var(--aero-shadow);
+      transform: scale(1.05) translateY(-2px);
+    }
+    .text-gradient {
+      background: linear-gradient(to right, #f472b6, #a78bfa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-aero-blue via-aero-green to-aero-purple text-aero-light flex flex-col min-h-screen">
+<body class="bg-gradient-animated text-aero-light flex flex-col min-h-screen">
   <div class="flex-1 flex items-center justify-center">
     <div id="root" class="hidden"></div>
     <div id="loading" class="flex items-center justify-center">
       <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-aero-glow"></div>
     </div>
   </div>
-  <footer class="bg-aero-dark bg-opacity-70 backdrop-blur-md py-4 text-center text-sm text-aero-light">
+  <footer class="bg-aero-dark bg-opacity-80 backdrop-blur-md py-4 text-center text-sm text-aero-light">
     <p>© 2025 CondoUnderground. All rights reserved.</p>
     <div class="mt-2 space-x-4">
-      <a href="/terms" class="text-aero-glow hover:underline">Terms of Service</a>
-      <a href="/privacy" class="text-aero-glow hover:underline">Privacy Policy</a>
-      <a href="/support" class="text-aero-glow hover:underline">Support</a>
+      <a href="/terms" class="text-aero-glow hover:text-aero-purple hover:underline">Terms of Service</a>
+      <a href="/privacy" class="text-aero-glow hover:text-aero-purple hover:underline">Privacy Policy</a>
+      <a href="/support" class="text-aero-glow hover:text-aero-purple hover:underline">Support</a>
     </div>
   </footer>
   <script>
@@ -40,21 +66,33 @@
   <script type="text/babel">
     function LandingPage() {
       return (
-        <div className="container p-8 bg-aero-dark bg-opacity-70 backdrop-blur-md rounded-2xl shadow-aero text-center">
-          <h1 className="text-4xl font-bold mb-4 font-aero">Welcome to CondoUnderground</h1>
-          <p className="text-lg mb-6 font-aero text-aero-light">Join our vibrant real-time chat platform to connect and communicate dynamically.</p>
+        <div className="container mx-auto p-8 bg-aero-dark bg-opacity-80 backdrop-blur-md rounded-2xl shadow-aero text-center max-w-lg">
+          <h1 className="text-4xl font-bold mb-4 font-aero text-gradient">Welcome to CondoUnderground</h1>
+          <p className="text-lg mb-6 font-aero text-aero-light">Join our vibrant real-time chat platform and explore condo listings with our powerful scraper.</p>
           <div className="space-y-4">
             <a
               href="/login"
-              className="block w-full py-2 bg-aero-blue hover:bg-aero-glow rounded-lg transition-all duration-200 transform hover:scale-105 shadow-aero font-aero"
+              className="block w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg"
             >
-              Login。于是
+              Login
             </a>
             <a
               href="/register"
-              className="block w-full py-2 bg-aero-purple hover:bg-aero-purple-dark rounded-lg transition-all duration-200 transform hover:scale-105 shadow-aero font-aero"
+              className="block w-full py-3 bg-gradient-to-r from-aero-purple to-aero-glow hover:from-aero-blue hover:to-aero-green rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg"
             >
               Register
+            </a>
+          </div>
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-2 font-aero text-aero-glow">Explore Condo Listings</h2>
+            <p className="text-aero-light mb-4">Our backend scraper fetches real-time condo data from condos.ca. Check out the source code or try it out!</p>
+            <a
+              href="https://github.com/sendiliniz/condo-underground"
+              className="inline-block py-2 px-4 bg-aero-dark border-2 border-aero-glow hover:bg-aero-glow hover:text-aero-dark rounded-lg transition-all duration-200 hover-glow font-aero"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Source on GitHub
             </a>
           </div>
         </div>
