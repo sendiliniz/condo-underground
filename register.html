@@ -79,15 +79,21 @@
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [error, setError] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
 
       const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setIsLoading(true);
+
         if (!name || !email || !password) {
           setError('Please fill in all fields');
+          setIsLoading(false);
           return;
         }
         if (!/\S+@\S+\.\S+/.test(email)) {
           setError('Invalid email format');
+          setIsLoading(false);
           return;
         }
         try {
@@ -102,10 +108,14 @@
             localStorage.setItem('username', data.username || name); // Store username (fallback to name)
             window.location.href = '/chat'; // Redirect to chat page
           } else {
-            setError('Registration failed. Email may already be in use.');
+            const errorData = await response.json();
+            setError(errorData.message || 'Registration failed. Email may already be in use.');
           }
         } catch (err) {
-          setError('An error occurred. Please try again.');
+          console.error('Registration error:', err);
+          setError('Failed to connect to the server. Please check your network or try again later.');
+        } finally {
+          setIsLoading(false);
         }
       };
 
@@ -118,7 +128,7 @@
               {error}
             </div>
           )}
-          <form className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="name" className="block text-sm font-medium font-aero text-aero-light">
                 Full Name
@@ -130,6 +140,7 @@
                 onChange={(e) => setName(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your full name"
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -143,6 +154,7 @@
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -156,13 +168,15 @@
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
             </div>
             <button
-              onClick={handleSubmit}
-              className="w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg"
+              type="submit"
+              className="w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}
             >
-              Register
+              {isLoading ? 'Registering...' : 'Register'}
             </button>
           </form>
           <p className="mt-4 text-aero-light">
@@ -180,14 +194,3 @@
               target="_blank"
               rel="noopener noreferrer"
             >
-              View Source on GitHub
-            </a>
-          </div>
-        </div>
-      );
-    }
-
-    ReactDOM.render(<RegisterPage />, document.getElementById('root'));
-  </script>
-</body>
-</html>
