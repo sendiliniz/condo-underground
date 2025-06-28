@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Welcome to CondoUnderground, a vibrant real-time chat platform for dynamic communication.">
+  <meta name="keywords" content="CondoUnderground, chat, messaging, community, real-time">
+  <meta name="author" content="CondoUnderground Team">
+  <title>CondoUnderground - Home</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2. MSU/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gradient-to-br from-aero-blue via-aero-green to-aero-purple text-aero-light flex flex-col min-h-screen">
+  <div class="flex-1 flex items-center justify-center">
+    <div id="root" class="hidden"></div>
+    <div id="loading" class="flex items-center justify-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-aero-glow"></div>
+    </div>
+  </div>
+  <footer class="bg-aero-dark bg-opacity-70 backdrop-blur-md py-4 text-center text-sm text-aero-light">
+    <p>© 2025 CondoUnderground. All rights reserved.</p>
+    <div class="mt-2 space-x-4">
+      <a href="/terms" class="text-aero-glow hover:underline">Terms of Service</a>
+      <a href="/privacy" class="text-aero-glow hover:underline">Privacy Policy</a>
+      <a href="/support" class="text-aero-glow hover:underline">Support</a>
+    </div>
+  </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        document.getElementById('loading').classList.add('hidden');
+        document.getElementById('root').classList.remove('hidden');
+      }, 500);
+    });
+  </script>
+  <script type="text/babel">
+    function LandingPage() {
+      return (
+        <div className="container p-8 bg-aero-dark bg-opacity-70 backdrop-blur-md rounded-2xl shadow-aero text-center">
+          <h1 className="text-4xl font-bold mb-4 font-aero">Welcome to CondoUnderground</h1>
+          <p className="text-lg mb-6 font-aero text-aero-light">Join our vibrant real-time chat platform to connect and communicate dynamically.</p>
+          <div className="space-y-4">
+            <a
+              href="/login"
+              className="block w-full py-2 bg-aero-blue hover:bg-aero-glow rounded-lg transition-all duration-200 transform hover:scale-105 shadow-aero font-aero"
+            >
+              Login。于是
+            </a>
+            <a
+              href="/register"
+              className="block w-full py-2 bg-aero-purple hover:bg-aero-purple-dark rounded-lg transition-all duration-200 transform hover:scale-105 shadow-aero font-aero"
+            >
+              Register
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<LandingPage />, document.getElementById('root'));
+  </script>
+</body>
+</html>
