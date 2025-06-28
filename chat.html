@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Chat in real-time on CondoUnderground, a vibrant platform for dynamic communication.">
-  <meta name="keywords" content="CondoUnderground, chat, messaging, community">
+  <meta name="description" content="Chat in real-time on CondoUnderground and explore condo listings with our scraper.">
+  <meta name="keywords" content="CondoUnderground, chat, messaging, community, condo listings, scraper">
   <meta name="author" content="CondoUnderground Team">
   <title>CondoUnderground - Chat</title>
   <link rel="icon" type="image/png" href="/favicon.png">
@@ -38,6 +38,183 @@
       }, 500);
     });
   </script>
-  <script type="text/babel" src="chat.js"></script>
+  <script type="text/babel">
+    function ChatPage() {
+      const [message, setMessage] = React.useState('');
+      const [messages, setMessages] = React.useState([]);
+
+      // Mock Socket.IO (replace with actual backend connection)
+      React.useEffect(() => {
+        const socket = io('https://your-backend.onrender.com'); // Replace with actual Socket.IO server
+        socket.on('message', (msg) => {
+          setMessages((prev) => [...prev, msg]);
+        });
+        return () => socket.disconnect();
+      }, []);
+
+      const sendMessage = (e) => {
+        e.preventDefault();
+        if (message.trim()) {
+          // Emit message to backend (mock)
+          setMessages((prev) => [...prev, { user: 'You', text: message }]);
+          setMessage('');
+        }
+      };
+
+      return (
+        <div className="container mx-auto p-8 bg-aero-dark bg-opacity-70 backdrop-blur-md rounded-2xl text-center max-w-lg">
+          <h1 className="text-4xl font-bold mb-4 font-aero">CondoUnderground Chat</h1>
+          <p className="text-lg mb-6 font-aero text-aero-light">Connect with the community in real-time and explore condo data.</p>
+          <div className="bg-aero-dark p-4 rounded-lg max-h-64 overflow-y-auto mb-4">
+            {messages.map((msg, i) => (
+              <div key={i} className="text-left mb-2">
+                <span className="font-bold text-aero-glow">{msg.user}: </span>
+                <span>{msg.text}</span>
+              </div>
+            ))}
+          </div>
+          <form onSubmit={sendMessage} className="flex space-x-2">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 p-2 bg-aero-dark border border-aero-light/20 rounded-lg text-aero-light focus:outline-none"
+            />
+            <button
+              type="submit"
+              className="py-2 px-4 bg-aero-blue hover:bg-aero-glow rounded-lg text-aero-light"
+            >
+              Send
+            </button>
+          </form>
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold mb-2 font-aero text-aero-glow">Condo Data Scraper</h2>
+            <p className="text-aero-light mb-4">Our backend fetches real-time condo listings from condos.ca. View the source code below or on GitHub.</p>
+            <a
+              href="https://github.com/sendiliniz/condo-underground"
+              className="inline-block py-2 px-4 bg-aero-blue hover:bg-aero-glow rounded-lg text-aero-light mb-4"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              View Source on GitHub
+            </a>
+            <div className="text-left">
+              <h3 className="text-lg font-bold mb-2 text-aero-glow">main.py</h3>
+              <pre className="bg-aero-dark p-4 rounded-lg overflow-x-auto text-sm">
+                <code>{`
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+import time
+
+# Base URL for the website
+BASE_URL = "https://www.condos.ca"
+
+# Function to get the soup object from a URL
+def get_soup(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        return BeautifulSoup(response.text, 'html.parser')
+    except requests.RequestException as e:
+        print(f"Error fetching {url}: {e}")
+        return None
+
+# Function to scrape condo listings from a single page
+def scrape_page(url):
+    soup = get_soup(url)
+    if not soup:
+        return []
+
+    listings = soup.find_all('div', class_='sc-1qwl2fh-0 sc-1qwl2fh-1 sc-12c38mc-0 kqYhDy')
+    data = []
+
+    for listing in listings:
+        try:
+            # Extract title
+            title_elem = listing.find('h2', class_='sc-1qwl2fh-5 hIebDO')
+            title = title_elem.text.strip() if title_elem else 'N/A'
+
+            # Extract price
+            price_elem = listing.find('div', class_='sc-1qwl2fh-7 hqSSdW')
+            price = price_elem.text.strip() if price_elem else 'N/A'
+
+            # Extract address
+            address_elem = listing.find('div', class_='sc-1qwl2fh-8 kXIiAy')
+            address = address_elem.text.strip() if address_elem else 'N/A'
+
+            # Extract size
+            size_elem = listing.find('div', class_='sc-12c38mc-4 jxmtse')
+            size = size_elem.text.strip() if size_elem else 'N/A'
+
+            # Extract beds and baths
+            beds_baths_elem = listing.find('div', class_='sc-12c38mc-5 dHzjwB')
+            beds_baths = beds_baths_elem.text.strip() if beds_baths_elem else 'N/A'
+
+            data.append({
+                'Title': title,
+                'Price': price,
+                'Address': address,
+                'Size': size,
+                'Beds_Baths': beds_baths
+            })
+        except AttributeError as e:
+            print(f"Error parsing listing: {e}")
+            continue
+
+    return data
+
+# Function to scrape multiple pages
+def scrape_multiple_pages(base_url, max_pages=5):
+    all_data = []
+    for page in range(1, max_pages + 1):
+        url = f"{base_url}?page={page}"
+        print(f"Scraping page {page}: {url}")
+        page_data = scrape_page(url)
+        all_data.extend(page_data)
+        time.sleep(2)  # Be polite, avoid overwhelming the server
+    return all_data
+
+# Main function
+def main():
+    # Example search URL for Toronto condos
+    search_url = f"{BASE_URL}/toronto/condos-for-sale"
+    print(f"Scraping condos from: {search_url}")
+
+    # Scrape up to 5 pages
+    condo_data = scrape_multiple_pages(search_url, max_pages=5)
+
+    # Convert to DataFrame
+    df = pd.DataFrame(condo_data)
+
+    # Save to CSV
+    output_file = 'condo_listings.csv'
+    df.to_csv(output_file, index=False)
+    print(f"Data saved to {output_file}")
+
+if __name__ == "__main__":
+    main()
+                `}</code>
+              </pre>
+              <h3 className="text-lg font-bold mb-2 text-aero-glow">requirements.txt</h3>
+              <pre className="bg-aero-dark p-4 rounded-lg overflow-x-auto text-sm">
+                <code>{`
+requests==2.31.0
+beautifulsoup4==4.12.2
+pandas==2.2.2
+                `}</code>
+              </pre>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<ChatPage />, document.getElementById('root'));
+  </script>
 </body>
 </html>
