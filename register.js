@@ -46,18 +46,28 @@ function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
-      const responseData = await response.json();
-      console.log('Server response:', responseData);
+
+      // Log full response for debugging
+      console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
+
+      const responseData = await response.json().catch(() => null); // Handle non-JSON responses
+      console.log('Response data:', responseData);
+
       if (response.ok) {
-        localStorage.setItem('token', responseData.token);
-        localStorage.setItem('username', responseData.username);
-        window.location.href = '/chat'; // Redirect to chat page
+        if (responseData && responseData.token && responseData.username) {
+          localStorage.setItem('token', responseData.token);
+          localStorage.setItem('username', responseData.username);
+          window.location.href = '/chat'; // Redirect to chat page
+        } else {
+          setError('Invalid server response: Missing token or username');
+        }
       } else {
-        setError(responseData.message || 'Registration failed');
+        setError(responseData?.message || `Registration failed with status ${response.status}`);
       }
     } catch (err) {
-      console.error('Registration error:', err.message);
-      setError('Failed to connect to the server. Check your network or try again later.');
+      console.error('Registration error details:', err.message, err.stack);
+      setError('Failed to connect to the server. Check your network or ensure the backend is running at http://localhost:3000.');
     } finally {
       setIsLoading(false);
     }
