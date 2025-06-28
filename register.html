@@ -12,9 +12,18 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
-  <link rel="stylesheet" href="styles.css">
   <style>
-    /* Vibrant animated gradient */
+    /* Embedded styles to ensure rendering */
+    :root {
+      --aero-blue: #60a5fa;
+      --aero-green: #34d399;
+      --aero-purple: #a78bfa;
+      --aero-purple-dark: #7c3aed;
+      --aero-light: #f1f5f9;
+      --aero-dark: #1e293b;
+      --aero-glow: #f472b6;
+      --aero-shadow: rgba(236, 72, 153, 0.3);
+    }
     .bg-gradient-animated {
       background: linear-gradient(45deg, #60a5fa, #34d399, #f472b6, #a78bfa);
       background-size: 400%;
@@ -65,9 +74,11 @@
   </footer>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOM loaded, showing root');
       setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('root').classList.remove('hidden');
+        console.log('Root visible');
       }, 500);
     });
   </script>
@@ -85,6 +96,7 @@
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        console.log('Submitting registration:', { name, email, password });
 
         if (!name || !email || !password) {
           setError('Please fill in all fields');
@@ -96,24 +108,25 @@
           setIsLoading(false);
           return;
         }
+
         try {
           const response = await fetch('http://localhost:3000/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password }),
           });
+          const responseData = await response.json();
+          console.log('Server response:', responseData);
           if (response.ok) {
-            const data = await response.json();
-            localStorage.setItem('token', data.token); // Store JWT token
-            localStorage.setItem('username', data.username || name); // Store username (fallback to name)
-            window.location.href = '/chat'; // Redirect to chat page
+            localStorage.setItem('token', responseData.token);
+            localStorage.setItem('username', responseData.username || name);
+            window.location.href = '/chat';
           } else {
-            const errorData = await response.json();
-            setError(errorData.message || 'Registration failed. Email may already be in use.');
+            setError(responseData.message || 'Registration failed. Try again.');
           }
         } catch (err) {
-          console.error('Registration error:', err);
-          setError('Failed to connect to the server. Please check your network or try again later.');
+          console.error('Registration error:', err.message);
+          setError('Failed to connect to the server. Check your network or try again later.');
         } finally {
           setIsLoading(false);
         }
@@ -194,3 +207,14 @@
               target="_blank"
               rel="noopener noreferrer"
             >
+              View Source on GitHub
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    ReactDOM.render(<RegisterPage />, document.getElementById('root'));
+  </script>
+</body>
+</html>
