@@ -12,18 +12,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
   <style>
-    /* Embedded styles to ensure rendering */
-    :root {
-      --aero-blue: #60a5fa;
-      --aero-green: #34d399;
-      --aero-purple: #a78bfa;
-      --aero-purple-dark: #7c3aed;
-      --aero-light: #f1f5f9;
-      --aero-dark: #1e293b;
-      --aero-glow: #f472b6;
-      --aero-shadow: rgba(236, 72, 153, 0.3);
-    }
+    /* Vibrant animated gradient */
     .bg-gradient-animated {
       background: linear-gradient(45deg, #60a5fa, #34d399, #f472b6, #a78bfa);
       background-size: 400%;
@@ -74,11 +65,9 @@
   </footer>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      console.log('DOM loaded, showing root');
       setTimeout(() => {
         document.getElementById('loading').classList.add('hidden');
         document.getElementById('root').classList.remove('hidden');
-        console.log('Root visible');
       }, 500);
     });
   </script>
@@ -90,45 +79,33 @@
       const [email, setEmail] = useState('');
       const [password, setPassword] = useState('');
       const [error, setError] = useState('');
-      const [isLoading, setIsLoading] = useState(false);
 
       const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
-        setIsLoading(true);
-        console.log('Submitting registration:', { name, email, password });
-
         if (!name || !email || !password) {
           setError('Please fill in all fields');
-          setIsLoading(false);
           return;
         }
         if (!/\S+@\S+\.\S+/.test(email)) {
           setError('Invalid email format');
-          setIsLoading(false);
           return;
         }
-
         try {
           const response = await fetch('http://localhost:3000/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password }),
           });
-          const responseData = await response.json();
-          console.log('Server response:', responseData);
           if (response.ok) {
-            localStorage.setItem('token', responseData.token);
-            localStorage.setItem('username', responseData.username || name);
-            window.location.href = '/chat';
+            const data = await response.json();
+            localStorage.setItem('token', data.token); // Store JWT token
+            localStorage.setItem('username', data.username || name); // Store username (fallback to name)
+            window.location.href = '/chat'; // Redirect to chat page
           } else {
-            setError(responseData.message || 'Registration failed. Try again.');
+            setError('Registration failed. Email may already be in use.');
           }
         } catch (err) {
-          console.error('Registration error:', err.message);
-          setError('Failed to connect to the server. Check your network or try again later.');
-        } finally {
-          setIsLoading(false);
+          setError('An error occurred. Please try again.');
         }
       };
 
@@ -141,7 +118,7 @@
               {error}
             </div>
           )}
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium font-aero text-aero-light">
                 Full Name
@@ -153,7 +130,6 @@
                 onChange={(e) => setName(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your full name"
-                disabled={isLoading}
               />
             </div>
             <div>
@@ -167,7 +143,6 @@
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your email"
-                disabled={isLoading}
               />
             </div>
             <div>
@@ -181,15 +156,13 @@
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
                 placeholder="Enter your password"
-                disabled={isLoading}
               />
             </div>
             <button
-              type="submit"
-              className="w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isLoading}
+              onClick={handleSubmit}
+              className="w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg"
             >
-              {isLoading ? 'Registering...' : 'Register'}
+              Register
             </button>
           </form>
           <p className="mt-4 text-aero-light">
