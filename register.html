@@ -72,35 +72,94 @@
     });
   </script>
   <script type="text/babel">
+    const { useState } = React;
+
     function RegisterPage() {
+      const [name, setName] = useState('');
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!name || !email || !password) {
+          setError('Please fill in all fields');
+          return;
+        }
+        if (!/\S+@\S+\.\S+/.test(email)) {
+          setError('Invalid email format');
+          return;
+        }
+        try {
+          const response = await fetch('http://localhost:3000/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+          });
+          if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.token); // Store JWT token
+            localStorage.setItem('username', data.username || name); // Store username (fallback to name)
+            window.location.href = '/chat'; // Redirect to chat page
+          } else {
+            setError('Registration failed. Email may already be in use.');
+          }
+        } catch (err) {
+          setError('An error occurred. Please try again.');
+        }
+      };
+
       return (
         <div className="container mx-auto p-8 bg-aero-dark bg-opacity-80 backdrop-blur-md rounded-2xl shadow-aero text-center max-w-md">
           <h1 className="text-4xl font-bold mb-4 font-aero text-gradient">Join CondoUnderground</h1>
-          <p className="text-lg mb-6 font-aero text-aero-light">Create an account to connect and explore condo listings.</p>
+          <h2 className="text-xl font-semibold mb-4 font-aero text-aero-glow">Register</h2>
+          {error && (
+            <div className="bg-red-500 text-white p-2 rounded-lg mb-4 text-center font-aero">
+              {error}
+            </div>
+          )}
           <form className="space-y-4">
             <div>
+              <label htmlFor="name" className="block text-sm font-medium font-aero text-aero-light">
+                Full Name
+              </label>
               <input
+                id="name"
                 type="text"
-                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
+                placeholder="Enter your full name"
               />
             </div>
             <div>
+              <label htmlFor="email" className="block text-sm font-medium font-aero text-aero-light">
+                Email
+              </label>
               <input
+                id="email"
                 type="email"
-                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
+                placeholder="Enter your email"
               />
             </div>
             <div>
+              <label htmlFor="password" className="block text-sm font-medium font-aero text-aero-light">
+                Password
+              </label>
               <input
+                id="password"
                 type="password"
-                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-3 bg-aero-dark border-2 border-aero-light/20 rounded-lg text-aero-light focus:outline-none input-glow"
+                placeholder="Enter your password"
               />
             </div>
             <button
-              type="submit"
+              onClick={handleSubmit}
               className="w-full py-3 bg-gradient-to-r from-aero-blue to-aero-green hover:from-aero-glow hover:to-aero-purple rounded-lg transition-all duration-200 hover-glow font-aero text-aero-light text-lg"
             >
               Register
@@ -113,15 +172,15 @@
             </a>
           </p>
           <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-2 font-aero text-aero-glow">Register to get access</h2>
-            <p className="text-aero-light mb-4">made to evade roblox mods</p>
+            <h2 className="text-2xl font-bold mb-2 font-aero text-aero-glow">Discover Condo Listings</h2>
+            <p className="text-aero-light mb-4">Our backend scraper fetches real-time condo data from condos.ca. Check out the source!</p>
             <a
               href="https://github.com/sendiliniz/condo-underground"
               className="inline-block py-2 px-4 bg-aero-dark border-2 border-aero-glow hover:bg-aero-glow hover:text-aero-dark rounded-lg transition-all duration-200 hover-glow font-aero"
               target="_blank"
               rel="noopener noreferrer"
             >
-              src code (dont skid)
+              View Source on GitHub
             </a>
           </div>
         </div>
